@@ -1,0 +1,51 @@
+// status: correct
+
+setCommandLineOptions("-g=MetaModelica");getErrorString();
+loadString("
+package P
+  function f
+    input output Real r;
+  algorithm
+    r := 2*r;
+  end f;
+end P;
+");getErrorString();
+list();getErrorString();
+list(exportKind=OpenModelica.Scripting.ExportKind.SCode);getErrorString();
+setCommandLineOptions("-d=nogen");getErrorString();
+P.f(1);getErrorString();
+setCommandLineOptions("-d=gen,noevalfunc");getErrorString();
+P.f(r=1);getErrorString();
+
+// Result:
+// true
+// ""
+// true
+// ""
+// "package P
+//   function f
+//     Real r;
+//   algorithm
+//     r := 2 * r;
+//   end f;
+// end P;"
+// ""
+// "package P
+//   function f
+//     output Real r = $in_r;
+//     input Real $in_r;
+//   algorithm
+//     r := 2 * r;
+//   end f;
+// end P;
+// "
+// ""
+// true
+// ""
+// 2.0
+// ""
+// true
+// ""
+// 2.0
+// ""
+// endResult
